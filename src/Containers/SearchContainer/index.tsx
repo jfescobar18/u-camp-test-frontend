@@ -23,7 +23,7 @@ const SearchContainer = () => {
 
     const onSearch = (value: string) => {
         axios
-            .get(`http://localhost:3000/api/search/${value}`)
+            .get(`${process.env.REACT_APP_BACKEND_URL}api/search/${value}`)
             .then((res) => {
                 setSearchResults(res.data.results)
             })
