@@ -4,6 +4,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { Product } from "../../Types"
 import { PaginationProps } from "antd"
+import Filters from "../../Components/Filters"
 
 const SearchContainer = () => {
     const [searchResults, setSearchResults] = useState<Product[]>([])
@@ -18,7 +19,7 @@ const SearchContainer = () => {
 
         setCurrentItems(searchResults.slice(itemOffset, endOffset))
         setPageCount(Math.ceil(searchResults.length / itemsPerPage))
-    }, [itemOffset, itemsPerPage, searchResults])
+    }, [itemOffset, searchResults])
 
     const onSearch = (value: string) => {
         axios
@@ -37,9 +38,43 @@ const SearchContainer = () => {
         setCurrent(page)
     }
 
+    const filterCondition = (value: string) => {
+        const filteredProducts = searchResults.filter(function (product) {
+            return product.condition === value
+        })
+
+        const endOffset = itemOffset + itemsPerPage
+        setCurrentItems(filteredProducts.slice(itemOffset, endOffset))
+        setPageCount(Math.ceil(filteredProducts.length / itemsPerPage))
+    }
+
+    const filterPrice = (value: string) => {
+        if (value === "more") {
+            const filteredProducts = searchResults.sort(
+                (a, b) => b.price - a.price
+            )
+            const endOffset = itemOffset + itemsPerPage
+            setCurrentItems(filteredProducts.slice(itemOffset, endOffset))
+            setPageCount(Math.ceil(filteredProducts.length / itemsPerPage))
+        } else {
+            const filteredProducts = searchResults.sort(
+                (a, b) => a.price - b.price
+            )
+            const endOffset = itemOffset + itemsPerPage
+            setCurrentItems(filteredProducts.slice(itemOffset, endOffset))
+            setPageCount(Math.ceil(filteredProducts.length / itemsPerPage))
+        }
+    }
+
     return (
         <>
             <ProductSearch onSearch={onSearch} />
+
+            <Filters
+                filterCondition={filterCondition}
+                filterPrice={filterPrice}
+            />
+
             <Catalog
                 currentItems={currentItems}
                 onChange={onChange}
